@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    	<meta charset="UTF-8">
+        <meta name="viewport" content="=width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{% block title %}{% endblock %}-{{ admin.blog_title|default('Blog Title') }}</title>
+        <link rel="icon" href="{{ url_for('static' ,filename='favicon.ico') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/perfect_blue.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    {% endblock %}
+</head>
+<body>
+{#做一个通用导航栏#}
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">{{ admin.blog_title }}</a>
+        {# 小屏幕呈现时，导航栏菜单选项会被折叠成亖的汉堡图标隐藏/展开 #}
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nabarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+        {% from 'bootstrap4/nav.html' import render_nav_item %}
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav mr-auto">
+                {{ render_nav_item('blog.index', 'Home') }}
+                {{ render_nav_item('blog.about', 'About') }}
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock nav %}
+
+<main class="container">
+    {#  做个消息提示分类  #}
+    {% for message in get_flashed_messages(with_categories=True)  %}
+    <div class="alert alert-{{ message[0] }}" role="alert">
+        <button class="close" type="button" data-dismiss="alert">&times;</button>
+        {{ message[1] }}
+    </div>
+    {% endfor %}
+
+    {% block content %}{% endblock content %}
+
+    {# 做个通用页脚 #}
+    {% block footer %}
+        <footer>
+            <small>&copy;2025<a href="#">Tommy</a>-<a href="#">GitHub</a>-<a href="#">helloflask</a></small>
+        </footer>
+    {% endblock footer %}
+</main>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/Script.js') }}"></script>
+{{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
+</body>
+</html>
