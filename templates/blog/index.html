@@ -42,5 +42,9 @@
         </div>
     </div>
     {% from 'bootstrap4/pagination.html' import render_pagination %}
-    {{ render_pagination(pagination) }}
+    {% if posts %}
+    	<div class="page-footer">
+            {{ render_pagination(pagination) }}
+        </div>
+    {% endif %}
 {% endblock %}
