@@ -8,6 +8,7 @@
         <link rel="icon" href="{{ url_for('static' ,filename='favicon.ico') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/perfect_blue.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     {% endblock %}
 </head>
 <body>
@@ -51,7 +52,9 @@
     {% endblock footer %}
 </main>
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/Script.js') }}"></script>
+
+<script   src="{{ url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+<script   src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
 </body>
 </html>
