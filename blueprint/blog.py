@@ -1,5 +1,5 @@
 from flask import Blueprint,render_template,request,current_app
-from bluelog.models import Post, Comment
+from bluelog.models import Post, Comment, Category
 from bluelog.helpers import is_url_safe
 
 bp = Blueprint('blog', __name__)
@@ -24,7 +24,12 @@ def show_category(category_id):
         if not target:
             continue
         if is_url_safe(target):
-            return render_template('blog/category.html')
+            category = Category.query.get_or_404(category_id)
+            page = request.args.get('page', type=int)
+            per_page = current_app.config['BLUELOG_POST_PER_PAGE']
+            pagination = Post.query.with_parent(category).order_by(Post.timestamp.desc()).paginate(page=page, per_page=per_page)
+            posts = pagination.items
+            return render_template('blog/category.html',posts=posts, pagination=pagination,category=category)
     return render_template('blog/category.html')
 
 @bp.route('/show_post/<int:post_id>', methods=['Get', 'POST'])
