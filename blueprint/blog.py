@@ -1,7 +1,12 @@
-from flask import Blueprint,render_template,request,current_app
+from flask import Blueprint, render_template, request, current_app, url_for, flash, redirect
+from flask_login import current_user
+
+
 from bluelog.models import Post, Comment, Category
 from bluelog.helpers import is_url_safe
-
+from bluelog.forms import AdminForm, CommentForm
+from bluelog.extions import db
+from bluelog.emails import send_new_comments,send_comments_reply
 bp = Blueprint('blog', __name__)
 
 
@@ -39,4 +44,42 @@ def show_post(post_id):
     per_page = current_app.config['BLUELOG_COMMENT_PER_PAGE']
     pagination = Comment.query.with_parent(post).order_by(Comment.timestamp.desc()).paginate(page=page,per_page=per_page)
     comments = pagination.items
-    return render_template('blog/post.html', post=post, comments=comments, pagination=pagination)
+
+    # if current_user.is_authenticated:
+    #     form = AdminForm()
+    #     form.auth.data = current_user.name
+    #     form.email.data = current_app.config['MAIL_USERNAME']
+    #     form.site.data = url_for('.index')
+    #     from_admin = True
+    #     reviewed = True
+    # else:
+    form = CommentForm()
+    from_admin = False
+    review = False
+
+    if form.validate_on_submit():
+        name = form.auth.data
+        email = form.email.data
+        site = form.site.data
+        body = form.body.data
+        comment = Comment(name=name, email=email, site=site, body=body,from_admin=from_admin, review=review)
+
+        replied_id = request.args.get('reply')
+        if replied_id:
+            replied_comment = Comment.query.get_or_404(replied_id)
+            comment.replied = replied_comment
+            send_comments_reply(replied_comment)
+            flash('Thanks your reply has been send to author', 'info')
+        db.session.add(comment)
+        db.session.commit()
+
+        flash('Thanks your comments will be published after reviewed', 'info')
+        send_new_comments(post)
+        return redirect(url_for('.show_post',post_id=post.id))
+
+    return render_template('blog/post.html', post=post, comments=comments, pagination=pagination,form=form)
+
+@bp.route('/reply/comment/<int:comment_id>', methods=['POST','GET'])
+def reply_comment(comment_id):
+        comment = Comment.query.get_or_404(comment_id)
+        return redirect(url_for('.show_post',post_id=comment.post_id, reply=comment.id_, auth=comment.name)+"#comment-form")

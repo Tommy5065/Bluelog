@@ -70,7 +70,7 @@ def faker_comment(count=100):
     for i in range(salt):
         comment2 = Comment(
             name = 'Eric',
-            email = 'Eric@example.com',
+            email = '2194927699@qq.com',
             body = faker.sentence(),
             site=faker.url(),
             from_admin = True,

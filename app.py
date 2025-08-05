@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template
 from bluelog.settings import Config
-from bluelog.extions import bootstrap, ckeditor, mail, db, moment
+from bluelog.extions import bootstrap, ckeditor, db, moment
 from bluelog.commands import register_command
 from bluelog.models import Admin, Category
 from blueprint.blog import bp as blog_bp
@@ -18,7 +18,6 @@ def create_app(config_name=None):
     def register_extensions(app):
         bootstrap.init_app(app)
         ckeditor.init_app(app)
-        mail.init_app(app)
         db.init_app(app)
         moment.init_app(app)
 

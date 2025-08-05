@@ -69,7 +69,7 @@
                                 {% endif %}
                                 <p class="mb-1">{{ comment.body }}</p>
                                 <div class="float-right">
-                                    <a href="#" class="btn btn-light btn-sm">Reply</a>
+                                    <a href="{{ url_for('.reply_comment',comment_id=comment.id_) }}" class="btn btn-light btn-sm">Reply</a>
                                 </div>
                             </li>
                     	{% endfor %}
@@ -81,6 +81,14 @@
          {% if comments %}
         	{{ render_pagination(pagination, fragment='#comments') }}
         {% endif %}
+        {% if request.args.get('reply') %}
+            <div class="alert alert-dark">
+                Reply to <strong>{{ request.args.get('auth') }}</strong>;
+                <a class="float-right" href="{{ url_for('.show_post', post_id=post.id) }}">Cancel</a>
+            </div>
+        {% endif %}
+        {% from 'bootstrap4/form.html' import render_form %}
+            {{ render_form(form)}}
         </div>
         <div class="col-sm-4 sidebar">
             {% include "blog/_sidebar.html" %}

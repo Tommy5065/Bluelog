@@ -1,9 +1,11 @@
-import os
-
 from flask import url_for
-from flask_mail import Message
-from app import mail
+from email.header import Header
+from email.mime.text import MIMEText
+from email.utils import formataddr
 from flask import current_app
+import smtplib
+
+
 
 """
 发送邮件有两个场景，一个是作者收到文章有新评论，一个是提醒用户（作者和读者）评论有了新回复
@@ -12,14 +14,34 @@ from flask import current_app
 3.在收到评论被回复的提醒，邮件正文中显示那个文章中的那个评论被回复了，也可以点击链接直接查看回复的评论内容
 """
 
-def send_email(subject,to,html):
-    msg = Message(subject,recipients=[to], html=html)
-    mail.send(msg)
+def send_email(subject,html,receiver,name='tammy0506'):
+    # 配置第三方SMTP服务
+    host = current_app.config['MAIL_SERVER']
+    mail_user = current_app.config['MAIL_USERNAME']
+    mail_pwd = current_app.config['MAIL_PASSWORD']
+
+    #配置发送方信息
+    sender = current_app.config['MAIL_DEFAULT_SENDER']
+    try:
+        smtpObj = smtplib.SMTP_SSL(host,465) # 建立和SMTP服务器链接
+        smtpObj.set_debuglevel(1)
+        smtpObj.login(mail_user, mail_pwd) #完成身份认证
+        html = html
+        msg = MIMEText(html, 'html', 'utf-8')
+        msg['From'] = formataddr(('BlueLog Admin', sender))
+        msg['To'] = formataddr((name, receiver))
+        msg['Subject'] = Header(subject, 'utf-8')
+
+        smtpObj.sendmail(sender, receiver, msg.as_string())
+        print('邮件发送成功')
+        smtpObj.quit()  # 结束会话
+    except smtplib.SMTPException as e:
+        print(f'报错信息{e}')
 
 # 提醒文章被评论
 def send_new_comments(post):
     post_url = url_for('blog.show_post', post_id=post.id, _external=True) +'#comments'
-    send_email(subject='New Comment', to=current_app.config['MAIL_USERNAME'],
+    send_email(subject='New Comment', receiver=current_app.config['BLUELOG_USERNAME'],
                html='<p>You have new comments of post:<i>%s</i></p>'
                     '<p>please click the link <a href=%s>%s</a></p>'
                     '<p><small style="color:#868e96" >Do not reply this email</small></p>'
@@ -29,7 +51,7 @@ def send_new_comments(post):
 # 提醒留言的评论被回复
 def send_comments_reply(comment):
     post_url = url_for('blog.show_post', post_id=comment.post_id, _external=True)+ '#comments'
-    send_email(subject='New reply', to=comment.email,
+    send_email(subject='New reply', name=comment.name, receiver=comment.email,
                html='<p>You have a new reply you left in the post:<i>%s</i></p>'
                     '<p>please click the link to check:<a href="%s">%s</a></p>'
                     %(comment.post.title,post_url,post_url)
