@@ -1,11 +1,12 @@
 import os
 from flask import Flask, render_template
 from bluelog.settings import Config
-from bluelog.extions import bootstrap, ckeditor, db, moment
+from bluelog.extions import bootstrap, ckeditor, db, moment,login
 from bluelog.commands import register_command
 from bluelog.models import Admin, Category
 from blueprint.blog import bp as blog_bp
 from blueprint.admin import bp as admin_bp
+from blueprint.auth import auth_bp
 
 def create_app(config_name=None):
 
@@ -20,6 +21,7 @@ def create_app(config_name=None):
         ckeditor.init_app(app)
         db.init_app(app)
         moment.init_app(app)
+        login.init_app(app)
 
     def register_errors(app):
         @app.errorhandler(400)
@@ -36,6 +38,7 @@ def create_app(config_name=None):
     def register_blueprint(app):
         app.register_blueprint(blog_bp)
         app.register_blueprint(admin_bp, url_prefix='/admin')
+        app.register_blueprint(auth_bp)
 
     register_extensions(app)
     register_command(app)

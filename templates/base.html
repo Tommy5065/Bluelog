@@ -47,6 +47,13 @@
     {% block footer %}
         <footer>
             <small>&copy;2025<a href="#">Tommy</a>-<a href="#">GitHub</a>-<a href="#">helloflask</a></small>
+            <small>
+            {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.logout', next=request.full_path) }}">logout</a>
+            {% else %}
+                    <a href="{{ url_for('auth.login', next=request.full_path) }}">login in</a>
+            {% endif %}
+             </small>
         </footer>
     {% endblock footer %}
 </main>

@@ -44,24 +44,24 @@ def show_post(post_id):
     pagination = Comment.query.with_parent(post).order_by(Comment.timestamp.desc()).paginate(page=page,per_page=per_page)
     comments = pagination.items
 
-    # if current_user.is_authenticated:
-    #     form = AdminForm()
-    #     form.auth.data = current_user.name
-    #     form.email.data = current_app.config['MAIL_USERNAME']
-    #     form.site.data = url_for('.index')
-    #     from_admin = True
-    #     reviewed = True
-    # else:
-    form = CommentForm()
-    from_admin = False
-    review = False
+    if current_user.is_authenticated:
+        form = AdminForm()
+        form.auth.data = current_user.name
+        form.email.data = current_app.config['MAIL_USERNAME']
+        form.site.data = url_for('.index')
+        from_admin = True
+        reviewed = True
+    else:
+        form = CommentForm()
+        from_admin = False
+        reviewed = False
 
     if form.validate_on_submit():
         name = form.auth.data
         email = form.email.data
         site = form.site.data
         body = form.body.data
-        comment = Comment(name=name, email=email, site=site, body=body,from_admin=from_admin, review=review)
+        comment = Comment(name=name, email=email, site=site, body=body,from_admin=from_admin, review=reviewed)
 
         replied_id = request.args.get('reply')
         if replied_id:
@@ -69,7 +69,6 @@ def show_post(post_id):
             comment.replied = replied_comment
             send_comments_reply(replied_comment)
             flash('Thanks your reply has been send to author', 'info')
-            comment=Comment(name=name, email=email, site=site, body=body,from_admin=from_admin, review=review, replied=replied_id)
         db.session.add(comment)
         db.session.commit()
 
