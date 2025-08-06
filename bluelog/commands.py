@@ -27,3 +27,44 @@ def register_command(app):
         faker_comment(comment)
 
         click.echo('Done')
+
+
+
+    @app.cli.command()
+    @click.option('--username', prompt=True, help='generate admin name')
+    @click.password_option()
+    def init(username,password):
+        """Generate admin count"""
+        db.drop_all()
+        db.create_all()
+
+        from bluelog.models import Admin
+        admin = Admin.query.first()
+        if admin:
+            click.echo('Admin count has already been, update the information')
+            admin.adminName = username
+            admin.generate_hash(password)
+            click.echo('update finish')
+        else:
+            click.echo('generate a new count')
+            admin = Admin(
+                adminName=username,
+                name = 'Yeri',
+                blog_title='BlueLog',
+                blog_sub_title = 'No, I am a real thing',
+                about='Any thing about you'
+            )
+            admin.generate_hash(password)
+            db.session.add(admin)
+
+        from bluelog.models import Category
+        category = Category.query.first()
+        if category is None:
+            click.echo('Generate a default category')
+            category = Category(name='default')
+            db.session.add(category)
+        else:
+            click.echo('categories has exist')
+
+        db.session.commit()
+        click.echo('Done!')

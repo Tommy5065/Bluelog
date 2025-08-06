@@ -9,7 +9,7 @@ def faker_admin():
         name = 'Erick',
         blog_title = 'Bluelog',
         blog_sub_title = "No, I am a real thing",
-        about = 'hhhhhhhhhhhh'
+        about = 'I am initialising about page'
     )
     admin.generate_hash('hello, flask')
     db.session.add(admin)
