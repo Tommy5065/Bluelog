@@ -18,6 +18,7 @@ class BaseConfig():
     BLUELOG_POST_PER_PAGE = 5
     BLUELOG_MANAGE_POST_PER_PAGE = 15
     BLUELOG_COMMENT_PER_PAGE = 7
+    BLUELOG_THEMES = {'perfect_blue':'Perfect Blue', 'black_swan':'Black Swan'}
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir,'data-dev.db')

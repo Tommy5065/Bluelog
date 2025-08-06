@@ -1,14 +1,13 @@
-from flask import Blueprint, render_template, request, current_app, url_for, flash, redirect
+from flask import Blueprint, render_template, request, current_app, url_for, flash, redirect, abort, make_response
 from flask_login import current_user
 
 
 from bluelog.models import Post, Comment, Category
-from bluelog.helpers import is_url_safe
+from bluelog.helpers import is_url_safe, redirect_up
 from bluelog.forms import AdminForm, CommentForm
 from bluelog.extions import db
 from bluelog.emails import send_new_comments,send_comments_reply
 bp = Blueprint('blog', __name__)
-
 
 @bp.route('/', defaults={'page':1})
 @bp.route('/page/<int:page>')
@@ -70,6 +69,7 @@ def show_post(post_id):
             comment.replied = replied_comment
             send_comments_reply(replied_comment)
             flash('Thanks your reply has been send to author', 'info')
+            comment=Comment(name=name, email=email, site=site, body=body,from_admin=from_admin, review=review, replied=replied_id)
         db.session.add(comment)
         db.session.commit()
 
@@ -83,3 +83,12 @@ def show_post(post_id):
 def reply_comment(comment_id):
         comment = Comment.query.get_or_404(comment_id)
         return redirect(url_for('.show_post',post_id=comment.post_id, reply=comment.id_, auth=comment.name)+"#comment-form")
+
+@bp.route('/change_theme/<theme_name>')
+def change_theme(theme_name):
+    if theme_name not in current_app.config['BLUELOG_THEMES'].keys():
+        abort(404)
+
+    response = make_response(redirect_up())
+    response.set_cookie('theme',theme_name,max_age=30*24*60*60)
+    return response
