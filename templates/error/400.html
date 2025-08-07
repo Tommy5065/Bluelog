@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>404报错</title>
-</head>
-<body>
-<h1>我是404报错</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %} 400错误 {% endblock %}
+
+{% block content %}
+	<p>{{ description|default('Bad Request') }} </p>
+{% endblock %}
+
+{% block footer %}{% endblock %}
