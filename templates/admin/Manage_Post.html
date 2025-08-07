@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %} Manager Post {% endblock %}
+
+{% block content %}
+	<div class="page-header">
+        <h1>
+            Posts <small class="text-muted">{{ posts|length }}</small>
+            <span class="float-right">
+                <a class="btn btn-primary btn-sm" href="{{ url_for('.new_post') }}">New Post</a>
+            </span>
+        </h1>
+    </div>
+    {% if posts %}
+    	 <table class="table table-striped">
+            <thead>
+                <tr>
+                    <td>No.</td>
+                    <td>Title</td>
+                    <td>Category</td>
+                    <td>Date</td>
+                    <td>Comments</td>
+                    <td>Words</td>
+                    <td>Actions</td>
+                </tr>
+            </thead>
+         {% for post in posts  %}
+         	<tr>
+                <td>{{ loop.index + ((pagination.page - 1)) * config.BLUELOG_MANAGE_POST_PER_PAGE }}</td>
+                <td><a href="{{ url_for('blog.show_post', post_id=post.id) }}">{{ post.title }}</a></td>
+                <td><a href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a></td>
+                <td>{{ moment(post.timestamp).format('LL') }}</td>
+                <td><a href="{{ url_for('blog.show_post', post_id=post.id)+'#comments' }}">{{ post.comment|length }}</a></td>
+                <td>{{ post.body|length }}</td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="#">Edit</a>
+                    <form class="inline" action="{{ url_for('.delete_post', post_id=post.id, next=request.full_path) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit"  onclick="return confirm('Are you sure delete?')" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+         {% endfor %}
+        </table>
+       {% from 'bootstrap4/pagination.html' import render_pagination %}
+        <div class="page-footer"> {{ render_pagination(pagination) }} </div>
+        {% else %}
+        <div class="tip"><h5>No Posts</h5></div>
+    {% endif %}
+{% endblock %}
