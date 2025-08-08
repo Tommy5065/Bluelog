@@ -17,11 +17,11 @@ class PostForm(FlaskForm):
     body = CKEditorField('Body', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
-    # 设置SelectField下拉选项（option）的值由choice设置
+    # 设置SelectField下拉选项（option）的值由choices设置
     def __init__(self, *args, **kwargs):
         from bluelog.models import Category
         super(PostForm, self).__init__(*args, **kwargs)
-        self.category.choice = [(category.id, category.name) for category in Category.query.order_by(Category.name).all()]
+        self.category.choices = [(category.id, category.name) for category in Category.query.order_by(Category.name).all()]
 
 
 # 创建分类表单
