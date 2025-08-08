@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, current_app
+from flask import Blueprint, render_template, request, current_app, flash, redirect, url_for
 from flask_login import login_required
 
 from bluelog.helpers import redirect_up
-from bluelog.models import Post
+from bluelog.models import Post, Category
 from bluelog.extions import db
+from bluelog.forms import PostForm
 bp = Blueprint('admin',__name__)
 
 
@@ -13,9 +14,43 @@ bp = Blueprint('admin',__name__)
 def login_protect():
     pass
 
-@bp.route('/write')
+@bp.route('/write', methods=['GET','Post'])
 def new_post():
-    return render_template('admin/write.html')
+    post_form = PostForm()
+
+    if post_form.validate_on_submit():
+        title = post_form.title.data
+        body = post_form.body.data
+        category = Category.query.get_or_404(post_form.category.data)
+        post = Post(title=title, body=body, category=category)
+        db.session.add(post)
+        db.session.commit()
+        flash('Create Post successfully','success')
+        return redirect(url_for('blog.show_post', post_id = post.id))
+
+    return render_template('admin/write.html', form=post_form)
+
+@bp.route('/edite_post/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    post_form = PostForm()
+    post = Post.query.get_or_404(post_id)
+
+    if post_form.validate_on_submit():
+        title = post_form.title.data
+        body = post_form.body.data
+        category = Category.query.get_or_404(post_form.category.data)
+        post = Post(title=title, body=body, category=category)
+        db.session.add(post)
+        db.session.commit()
+        flash('Post update', 'success')
+        return redirect(url_for('blog.show_post', post_id=post.id))
+    post_form.title.data = post.title
+    post_form.category.data = post.category_id
+    post_form.body.data = post.body
+
+    return render_template('admin/write.html', form=post_form)
+
+
 
 @bp.route('/category')
 def new_category():
@@ -38,3 +73,5 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
     return redirect_up()
+
+
