@@ -61,7 +61,8 @@ def show_post(post_id):
         email = form.email.data
         site = form.site.data
         body = form.body.data
-        comment = Comment(name=name, email=email, site=site, body=body,from_admin=from_admin, review=reviewed)
+        post = Post.query.get(post_id)
+        comment = Comment(name=name, email=email, site=site, body=body, from_admin=from_admin, review=reviewed, post=post)
 
         replied_id = request.args.get('reply')
         if replied_id:
@@ -69,6 +70,7 @@ def show_post(post_id):
             comment.replied = replied_comment
             send_comments_reply(replied_comment)
             flash('Thanks your reply has been send to author', 'info')
+
         db.session.add(comment)
         db.session.commit()
 
@@ -76,7 +78,7 @@ def show_post(post_id):
         send_new_comments(post)
         return redirect(url_for('.show_post',post_id=post.id))
 
-    return render_template('blog/post.html', post=post, comments=comments, pagination=pagination,form=form)
+    return render_template('blog/post.html', post=post, comments=comments, pagination=pagination, form=form)
 
 @bp.route('/reply/comment/<int:comment_id>', methods=['POST','GET'])
 def reply_comment(comment_id):

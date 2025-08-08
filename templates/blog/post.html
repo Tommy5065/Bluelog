@@ -41,6 +41,7 @@
               {% if comments %}
                   <ul class="list-group">
                     	{% for comment in comments %}
+                            {% if comment.review %}
                     		<li class="list-group-item list-group-item-action flex-column">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h5 class="mb-1">
@@ -70,8 +71,17 @@
                                 <p class="mb-1">{{ comment.body }}</p>
                                 <div class="float-right">
                                     <a href="{{ url_for('.reply_comment',comment_id=comment.id_) }}" class="btn btn-light btn-sm">Reply</a>
+                                    {% if current_user.is_authenticated %}
+                                    	 <a class="btn btn-light btn-sm" href="mailto:{{ comment.email }}">Email</a>
+                                        <form class="inline" method="post" action="{{ url_for('admin.delete_comment', comment_id=comment.id_)}}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure delete?')">Delete</button>
+                                        </form>
+                                    {% endif %}
+
                                 </div>
                             </li>
+                            {%endif %}
                     	{% endfor %}
                   </ul>
               {% else %}
