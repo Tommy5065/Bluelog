@@ -90,9 +90,10 @@
     {% endblock footer %}
 </main>
 
-
-<script   src="{{ url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
-<script   src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-{{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
+{% block script %}
+	<script   src="{{ url_for('static', filename='js/jquery-3.7.1.js') }}"></script>
+    <script   src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
+{% endblock %}
 </body>
 </html>
