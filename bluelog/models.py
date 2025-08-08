@@ -30,7 +30,7 @@ class Post(db.Model):
     comment = db.relationship('Comment', back_populates='post', cascade='all')
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',back_populates='post')
-
+    can_comments = db.Column(db.Boolean, default=True)
 
 class Comment(db.Model):
     __tablename__ = 'comment'

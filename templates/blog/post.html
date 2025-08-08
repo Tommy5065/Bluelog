@@ -32,6 +32,16 @@
                 </div>
             </div>
 
+            {% if current_user.is_authenticated  %}
+            	<form class="float-right" method="post" action="{{ url_for('admin.comment_button', next=request.full_path, post_id=post.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-warning">
+                    {% if post.can_comments %} Disable {% else %} Enable {% endif %}
+                    Comment
+                    </button>
+                </form>
+            {% endif %}
+
              <div class="comments" id="comments">
              <h3>{{ comments|length }} Comments
                  <small>
@@ -97,8 +107,12 @@
                 <a class="float-right" href="{{ url_for('.show_post', post_id=post.id) }}">Cancel</a>
             </div>
         {% endif %}
-        {% from 'bootstrap4/form.html' import render_form %}
+        {% if post.can_comments %}
+        	{% from 'bootstrap4/form.html' import render_form %}
             {{ render_form(form)}}
+        {% else %}
+            <div class="tip"><h5>Comment disable</h5></div>
+        {% endif %}
         </div>
         <div class="col-sm-4 sidebar">
             {% include "blog/_sidebar.html" %}

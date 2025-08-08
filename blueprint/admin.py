@@ -104,3 +104,17 @@ def approve_comment(comment_id):
     db.session.commit()
     flash('Comment published','success')
     return redirect_up()
+
+@bp.route('/comment_button/<int:post_id>',methods=['POST'])
+def comment_button(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.can_comments:
+        post.can_comments=False
+        db.session.commit()
+        flash('Comment close','info')
+    else:
+        post.can_comments=True
+        db.session.commit()
+        flash('Comment open','success')
+    return redirect_up()
+
