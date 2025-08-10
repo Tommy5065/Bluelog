@@ -32,7 +32,7 @@ class CategoryForm(FlaskForm):
     # 防止分类名称重复自定义验证器
     def validate_name(self, field):
         from bluelog.models import Category
-        if Category.query.filter_by(name=field.date).first():
+        if Category.query.filter_by(name=field.data).first():
             raise ValueError('Name already in use.')
 
 #创建评论表单
