@@ -57,4 +57,14 @@ class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     post = db.relationship(Post, back_populates='category')
+
+    # 删除分类后文章划为默认分类
+    def Delete(self):
+        default_category = Category.query.get(1)
+        posts = self.post[:]
+        for post in posts:
+            post.category = default_category
+        db.session.delete(self)
+        db.session.commit()
